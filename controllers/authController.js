@@ -1,6 +1,11 @@
 const asyncHandler = require("express-async-handler");
 const bcrybt = require("bcrypt");
-const { User, validatRegisterUser } = require("../models/User");
+const jwt = require("jsonwebtoken");
+const {
+  User,
+  validatRegisterUser,
+  validatLoginUser,
+} = require("../models/User");
 /**------------------------------------------
  * @desc    Register a new user
  * @route   /api/auth/register
@@ -29,9 +34,43 @@ module.exports.registerModuleCntr = asyncHandler(async (req, res) => {
   });
   // send user to save it
   await user.save();
+  // @TODO: verify user account
 
   // send response to the client
   res.status(201).json({
     message: "User Created Successfully",
+  });
+});
+
+/**------------------------------------------
+ * @desc    Login  user
+ * @route   /api/auth/login
+ * @method POST
+ * @access  Public
+ ------------------------------------------*/
+module.exports.loginModuleCntr = asyncHandler(async (req, res) => {
+  // validation
+  const { error } = validatLoginUser(req.body);
+  if (error) return res.status(400).json({ message: error.details[0].message });
+
+  // is user exist
+  let user = await User.findOne({ email: req.body.email });
+  if (!user)
+    return res.status(400).json({ message: "you are not registerd user." });
+
+  // compare password
+  const validPassword = await bcrybt.compare(req.body.password, user.password);
+  if (!validPassword)
+    return res.status(400).json({ message: " password not valid " });
+  // @TODO: verify user account
+
+  // generate token jwt
+    const token = user.genrateToken();
+  // send response to the client
+  res.status(200).json({
+    _id: user._id,
+    isAdmin: user.isAdmin,
+    profilePhoto: user.profilePhoto,
+    token: token,
   });
 });

@@ -1,5 +1,4 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const coneectToDb = require("./config/db");
 require("dotenv").config();
 // connect to db
@@ -13,10 +12,11 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 
 // Routes
 app.use("/api/auth", require("./routes/authRoute"));
+app.use("/api/users", require("./routes/usersRouter"));
 // handel errors
 // app.use(notFound);
 // app.use(errorHandler);
 
-app.listen(process.env.PORT, () => {
+app.listen(process.env.PORT || 5000, () => {
   console.log("The Courses is Connected  ");
 });
