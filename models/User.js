@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema(
     },
     profilePhoto: {
       type: Object,
-      defult: {
+      default: {
         url: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbyHZ4yjBXpnnG01YecWfbRFKuukNxlmYE4wRGg5I0jaj6StK0BLJ2SaQ-jcUXT_dAlmo&usqp=CAU",
         publicId: null,
       },
