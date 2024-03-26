@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const { User, validatUpdateUserProfile } = require("../models/User");
 const bcrybt = require("bcrypt");
 const path = require("path");
+const fs = require("fs");
 const { uploadImageUploadImage } = require("../utils/cloudinary");
 /**
  * @desc    get all users profile
@@ -94,4 +95,11 @@ module.exports.profilePhotoUploadCntr = asyncHandler(async (req, res) => {
     url: resulte.secure_url,
     public_id: resulte.public_id,
   };
+  await user.save();
+
+  // send response to the client
+  res.status(200).json({ message: "Profile photo uploaded" });
+
+  // remove the file from the server
+  fs.unlinkSync(imagePath);
 });
