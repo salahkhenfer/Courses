@@ -62,3 +62,12 @@ module.exports.countUsers = asyncHandler(async (req, res) => {
   const count = await User.countDocuments();
   res.status(200).json(count);
 });
+
+/**
+ * @desc    Profile photo upload
+ * @route   /api/users/profile/profile-photo-upload
+ * @method POST
+ * @access  private (only User logged in)
+ */
+
+module.exports.profilePhotoUpload = asyncHandler(async (req, res) => {});
