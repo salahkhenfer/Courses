@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const { User, validatUpdateUserProfile } = require("../models/User");
 const bcrybt = require("bcrypt");
+const path = require("path");
 /**
  * @desc    get all users profile
  * @route   /api/users/profile
@@ -72,5 +73,11 @@ module.exports.countUsers = asyncHandler(async (req, res) => {
 
 module.exports.profilePhotoUploadCntr = asyncHandler(async (req, res) => {
   console.log(req.file);
+  // 1  check if file is uploaded
+  if (!req.file) return res.status(400).json({ message: "No file uploaded" });
+  // get the path of the file
+  const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
+
+  // upload to cloudinary
   res.status(200).json({ message: "Profile photo uploaded" });
 });
