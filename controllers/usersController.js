@@ -3,7 +3,10 @@ const { User, validatUpdateUserProfile } = require("../models/User");
 const bcrybt = require("bcrypt");
 const path = require("path");
 const fs = require("fs");
-const { uploadImageUploadImage } = require("../utils/cloudinary");
+const {
+  uploadImageUploadImage,
+  removeImageCloudinary,
+} = require("../utils/cloudinary");
 /**
  * @desc    get all users profile
  * @route   /api/users/profile
@@ -82,23 +85,24 @@ module.exports.profilePhotoUploadCntr = asyncHandler(async (req, res) => {
 
   // upload to cloudinary
   const resulte = await uploadImageUploadImage(imagePath);
-  console.log(resulte);
-  res.status(200).json({ message: "Profile photo uploaded" });
+
   // find user and update photo
-  const user = await User.findByIdAndUpdate(req.user._id);
-  if (user.profilePhoto.public_id !== null) {
-    await removeImageCloudinary(user.profilePhoto.public_id);
+  const user = await User.findById(req.user._id);
+  if (user.profilePhoto.publicId !== null) {
+    await removeImageCloudinary(user.profilePhoto.publicId);
   }
 
   // change the profile photo
   user.profilePhoto = {
     url: resulte.secure_url,
-    public_id: resulte.public_id,
+    publicId: resulte.public_id,
   };
   await user.save();
 
   // send response to the client
-  res.status(200).json({ message: "Profile photo uploaded" });
+  res
+    .status(200)
+    .json({ message: "Profile photo uploaded", url: resulte.secure_url });
 
   // remove the file from the server
   fs.unlinkSync(imagePath);

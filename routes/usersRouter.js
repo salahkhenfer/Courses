@@ -24,6 +24,7 @@ router.put(
 );
 router.post(
   "/profile/profile-photo-upload",
+  verifyToken,
   photoUpload.single("profilePhoto"),
   profilePhotoUploadCntr
 );
