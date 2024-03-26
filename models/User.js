@@ -71,7 +71,10 @@ function validatRegisterUser(obj) {
 }
 // genrate token
 UserSchema.methods.genrateToken = function () {
-  const token = jwt.sign({ _id: this._id }, process.env.JWT_SECRET);
+  const token = jwt.sign(
+    { _id: this._id, isAdmin: this.isAdmin },
+    process.env.JWT_SECRET
+  );
   return token;
 };
 const User = mongoose.model("User", UserSchema);
