@@ -6,6 +6,6 @@ const {
 const { verifyTokenAdmin, verifyToken } = require("../middlewares/verifyToken");
 
 router.get("/profile", verifyTokenAdmin, getAllUsers);
-router.get("/profile/:id", verifyToken, getUserProfile);
+router.get("/profile/:id", verifyToken, validateObjectId, getUserProfile);
 
 module.exports = router;
