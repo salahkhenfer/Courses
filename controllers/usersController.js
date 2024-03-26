@@ -70,4 +70,7 @@ module.exports.countUsers = asyncHandler(async (req, res) => {
  * @access  private (only User logged in)
  */
 
-module.exports.profilePhotoUpload = asyncHandler(async (req, res) => {});
+module.exports.profilePhotoUploadCntr = asyncHandler(async (req, res) => {
+  console.log(req.file);
+  res.status(200).json({ message: "Profile photo uploaded" });
+});
