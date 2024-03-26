@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const { User, validatUpdateUserProfile } = require("../models/User");
 const bcrybt = require("bcrypt");
 const path = require("path");
+const { uploadImageUploadImage } = require("../utils/cloudinary");
 /**
  * @desc    get all users profile
  * @route   /api/users/profile
@@ -79,5 +80,18 @@ module.exports.profilePhotoUploadCntr = asyncHandler(async (req, res) => {
   const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
 
   // upload to cloudinary
+  const resulte = await uploadImageUploadImage(imagePath);
+  console.log(resulte);
   res.status(200).json({ message: "Profile photo uploaded" });
+  // find user and update photo
+  const user = await User.findByIdAndUpdate(req.user._id);
+  if (user.profilePhoto.public_id !== null) {
+    await removeImageCloudinary(user.profilePhoto.public_id);
+  }
+
+  // change the profile photo
+  user.profilePhoto = {
+    url: resulte.secure_url,
+    public_id: resulte.public_id,
+  };
 });
