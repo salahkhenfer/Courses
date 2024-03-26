@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 const { User } = require("../models/User");
 
-module.exports.verifyToken = asyncHandler(async (req, res, next) => {
+const verifyToken = asyncHandler(async (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   if (!token) return res.status(401).json({ message: "Access Denied" });
 
@@ -14,3 +14,13 @@ module.exports.verifyToken = asyncHandler(async (req, res, next) => {
     res.status(400).json({ message: "Invalid Token" });
   }
 });
+
+const verifyTokenAdmin = asyncHandler(async (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (!req.user.isAdmin)
+      return res.status(403).json({ message: "Only admin can accses  " });
+    next();
+  });
+});
+
+module.exports = { verifyToken, verifyTokenAdmin };

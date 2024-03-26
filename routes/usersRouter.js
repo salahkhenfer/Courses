@@ -1,7 +1,11 @@
 const router = require("express").Router();
-const { getAllUsers } = require("../controllers/usersController");
-const { verifyToken } = require("../middlewares/verifyToken");
+const {
+  getAllUsers,
+  getUserProfile,
+} = require("../controllers/usersController");
+const { verifyTokenAdmin, verifyToken } = require("../middlewares/verifyToken");
 
-router.get("/profile", verifyToken, getAllUsers);
+router.get("/profile", verifyTokenAdmin, getAllUsers);
+router.get("/profile/:id", verifyToken, getUserProfile);
 
 module.exports = router;
