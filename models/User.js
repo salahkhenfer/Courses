@@ -77,6 +77,20 @@ UserSchema.methods.genrateToken = function () {
   );
   return token;
 };
+const validatUpdateUserProfile = (obj) => {
+  const schema = Joi.object({
+    username: Joi.string().min(3).max(50),
+    password: Joi.string().min(5).max(1024),
+    bio: Joi.string().max(255),
+  });
+  return schema.validate(obj);
+};
+
 const User = mongoose.model("User", UserSchema);
 
-module.exports = { User, validatRegisterUser, validatLoginUser };
+module.exports = {
+  User,
+  validatRegisterUser,
+  validatLoginUser,
+  validatUpdateUserProfile,
+};

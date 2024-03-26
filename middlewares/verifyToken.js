@@ -22,5 +22,12 @@ const verifyTokenAdmin = asyncHandler(async (req, res, next) => {
     next();
   });
 });
+const verifyTokenOnlyuser = asyncHandler(async (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (req.user._id !== req.params.id)
+      return res.status(403).json({ message: "Only user can accses  " });
+    next();
+  });
+});
 
-module.exports = { verifyToken, verifyTokenAdmin };
+module.exports = { verifyToken, verifyTokenAdmin, verifyTokenOnlyuser };

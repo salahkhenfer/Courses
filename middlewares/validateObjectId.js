@@ -6,3 +6,5 @@ const validateObjectId = asyncHandler(async (req, res, next) => {
     return res.status(400).json({ message: "Invalid Object Id" });
   next();
 });
+
+module.exports = validateObjectId;
