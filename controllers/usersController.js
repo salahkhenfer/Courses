@@ -7,6 +7,7 @@ const {
   uploadImageUploadImage,
   removeImageCloudinary,
 } = require("../utils/cloudinary");
+const { Post } = require("../models/Post");
 /**
  * @desc    get all users profile
  * @route   /api/users/profile
@@ -57,7 +58,6 @@ module.exports.updateUserProfile = asyncHandler(async (req, res) => {
   if (!user) return res.status(404).json({ message: "User not found" });
   res.status(200).json(user);
 });
-
 /**
  * @desc    count   user
  * @route   /api/users/count
@@ -106,4 +106,23 @@ module.exports.profilePhotoUploadCntr = asyncHandler(async (req, res) => {
 
   // remove the file from the server
   fs.unlinkSync(imagePath);
+});
+
+/**
+ * @desc    delete user
+ * @route   /api/users/profile/:id
+ * @method DELETE
+ * @access  private (admin)
+ */
+module.exports.deleteUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.params.id);
+  if (!user) {
+    return res.status(404).json({ message: "user not found" });
+  }
+  if (user.profilePhoto.publicId !== null) {
+    await cloudinaryRemoveImage(user.profilePhoto.publicId);
+  }
+  await User.findByIdAndDelete(req.params.id);
+
+  res.status(200).json({ message: "User deleted" });
 });

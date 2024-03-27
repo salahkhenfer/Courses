@@ -29,5 +29,21 @@ const verifyTokenOnlyuser = asyncHandler(async (req, res, next) => {
     next();
   });
 });
+const verifyTokenAndAuthoration = asyncHandler(async (req, res, next) => {
+  verifyToken(req, res, () => {
+    if (req.user._id === req.params.id || req.user.isAdmin) {
+      next();
+    } else {
+      return res
+        .status(403)
+        .json({ message: "Only user or admin can accses  " });
+    }
+  });
+});
 
-module.exports = { verifyToken, verifyTokenAdmin, verifyTokenOnlyuser };
+module.exports = {
+  verifyToken,
+  verifyTokenAdmin,
+  verifyTokenOnlyuser,
+  verifyTokenAndAuthoration,
+};

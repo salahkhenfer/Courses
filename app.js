@@ -13,6 +13,8 @@ app.use(express.urlencoded({ extended: true })); // Parse URL-encoded bodies
 // Routes
 app.use("/api/auth", require("./routes/authRoute"));
 app.use("/api/users", require("./routes/usersRouter"));
+app.use("/api/posts", require("./routes/PostsRoute"));
+
 // handel errors
 // app.use(notFound);
 // app.use(errorHandler);
