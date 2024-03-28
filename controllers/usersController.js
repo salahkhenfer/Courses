@@ -6,6 +6,7 @@ const fs = require("fs");
 const {
   uploadImageUploadImage,
   removeImageCloudinary,
+  cloudinaryRemoveMultipleImage,
 } = require("../utils/cloudinary");
 const { Post } = require("../models/Post");
 /**
@@ -27,7 +28,9 @@ module.exports.getAllUsers = asyncHandler(async (req, res) => {
  */
 
 module.exports.getUserProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.params.id).select("-password");
+  const user = await User.findById(req.params.id)
+    .select("-password")
+    .populate("posts");
   if (!user) return res.status(404).json({ message: "User not found" });
   res.status(200).json(user);
 });
@@ -119,10 +122,63 @@ module.exports.deleteUserProfile = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ message: "user not found" });
   }
+  // get all user posts
+  const post = await Post.find({ user: user._id });
+  // get publicId
+  const publicId = post?.map((post) => post.image.publicId);
+
+  // remove all images from cloudinary
+  if (publicId?.length > 0) {
+    await cloudinaryRemoveMultipleImage(publicId);
+  }
   if (user.profilePhoto.publicId !== null) {
     await cloudinaryRemoveImage(user.profilePhoto.publicId);
   }
+
+  // delate user posts and comments
+  await Post.deleteMany({ user: user._id });
+  await Comment.deleteMany({ user: user._id });
+
   await User.findByIdAndDelete(req.params.id);
 
   res.status(200).json({ message: "User deleted" });
+});
+
+/**
+ * @desc    toggle like
+ * @route   /api/users/profile/like/:id
+ * @method PUT
+ * @access  private (only User logged in)
+ */
+
+module.exports.toggleLike = asyncHandler(async (req, res) => {
+  const loggedInUser = req.user._id;
+  const { id: postId } = req.params;
+
+  let post = await Post.findById(postId);
+  if (!post) return res.status(404).json({ message: "Post not found" });
+
+  const isPostAlreadyLiked = post.likes.find(
+    (user) => user.toString() === loggedInUser.toString()
+  );
+  if (isPostAlreadyLiked) {
+    post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $pull: { likes: loggedInUser },
+      },
+      { new: true }
+    );
+  } else {
+    post = await Post.findByIdAndUpdate(
+      postId,
+      {
+        $push: { likes: loggedInUser },
+      },
+      { new: true }
+    );
+  }
+
+  res.status(200).json(post);
+  // send response to the client
 });

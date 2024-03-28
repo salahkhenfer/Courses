@@ -43,9 +43,20 @@ const PostSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
   }
 );
 
+PostSchema.virtual("comments", {
+  ref: "Comment",
+  localField: "_id",
+  foreignField: "postId",
+});
 const validateCreatePost = (post) => {
   const schema = Joi.object({
     title: Joi.string().min(3).max(255).required(),

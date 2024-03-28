@@ -97,12 +97,9 @@ module.exports.getAllPosts = asyncHandler(async (req, res) => {
  * ------------------------------------------*/
 
 module.exports.getSinglePost = asyncHandler(async (req, res) => {
-  const post = await Post.findById(req.params.id).populate("user", [
-    "-password",
-    "-createdAt",
-    "-updatedAt",
-    "-__v",
-  ]);
+  const post = await Post.findById(req.params.id)
+    .populate("user", ["-password", "-createdAt", "-updatedAt", "-__v"])
+    .populate("comments");
   if (!post) return res.status(404).json({ message: "Post not found" });
   res.status(200).json(post);
 });
@@ -140,6 +137,9 @@ module.exports.deletePost = asyncHandler(async (req, res) => {
     await removeImageCloudinary(post.image.publicId);
 
     // @TODO: remove comments  of the post
+    await Comment.deleteMany({ postId: req.params.id });
+
+    
     return res.status(200).json({ message: "Post deleted successfully" });
   }
 
@@ -188,4 +188,58 @@ module.exports.updatePostCtrl = asyncHandler(async (req, res) => {
   ).populate("user", ["-password"]);
   // 5. Send response to the client
   res.status(200).json(updatedPost);
+});
+
+/**------------------------------------------
+ * @desc    update post image
+ * @route   /api/posts/update-image/:id
+ * @method  PUT
+ * @access  Private
+ * ------------------------------------------*/
+
+module.exports.updatePostImage = asyncHandler(async (req, res) => {
+  //  Get post from DB
+  const post = await Post.findById(req.params.id);
+  if (!post) {
+    return res.status(404).json({ message: "post not found" });
+  }
+
+  //  check if this post belong to logged in user
+  if (req.user._id !== post.user.toString()) {
+    return res
+      .status(403)
+      .json({ message: "access denied, you are not allowed" });
+  }
+
+  //  check if image uploaded
+  if (!req.file) {
+    return res.status(400).json({ message: "Please upload an image" });
+  }
+
+  //  remove image from cloudinary
+  await removeImageCloudinary(post.image.publicId);
+
+  //  upload image
+  const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
+
+  const result = await uploadImageUploadImage(imagePath);
+
+  //  update post image
+  const updatedPost = await Post.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        image: {
+          url: result.secure_url,
+          publicId: result.public_id,
+        },
+      },
+    },
+    { new: true }
+  ).populate("user", ["-password"]);
+
+  //  send response
+  res.status(200).json(updatedPost);
+  //  delete image from server
+  fs.unlinkSync(imagePath);
 });

@@ -6,6 +6,7 @@ const {
   countUsers,
   profilePhotoUploadCntr,
   deleteUserProfile,
+  toggleLike,
 } = require("../controllers/usersController");
 const photoUpload = require("../middlewares/photoUpload");
 const validateObjectId = require("../middlewares/validateObjectId");

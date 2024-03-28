@@ -15,6 +15,14 @@ const verifyToken = asyncHandler(async (req, res, next) => {
   }
 });
 
+// const verifyTokenAdmin = asyncHandler(async (req, res, next) => {
+//   verifyToken(req, res, () => {
+//     if (!req.user.isAdmin)
+//       return res.status(403).json({ message: "Only admin can accses  " });
+//     next();
+//   });
+// });
+
 const verifyTokenAdmin = asyncHandler(async (req, res, next) => {
   verifyToken(req, res, () => {
     if (!req.user.isAdmin)
@@ -22,6 +30,7 @@ const verifyTokenAdmin = asyncHandler(async (req, res, next) => {
     next();
   });
 });
+
 const verifyTokenOnlyuser = asyncHandler(async (req, res, next) => {
   verifyToken(req, res, () => {
     if (req.user._id !== req.params.id)

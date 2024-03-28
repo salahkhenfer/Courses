@@ -28,4 +28,16 @@ const removeImageCloudinary = async (public_id) => {
   }
 };
 
-module.exports = { uploadImageUploadImage, removeImageCloudinary };
+const cloudinaryRemoveMultipleImage = async (public_ids) => {
+  try {
+    const result = await cloudinary.api.delete_resources(public_ids);
+    return result;
+  } catch (error) {
+    return error;
+  }
+};
+module.exports = {
+  uploadImageUploadImage,
+  removeImageCloudinary,
+  cloudinaryRemoveMultipleImage,
+};
