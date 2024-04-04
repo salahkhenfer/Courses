@@ -18,7 +18,7 @@ const {
 } = require("../middlewares/verifyToken");
 
 router.get("/profile", verifyTokenAdmin, getAllUsers);
-router.get("/profile/:id", verifyToken, validateObjectId, getUserProfile);
+router.get("/profile/:id", validateObjectId, getUserProfile);
 router.put(
   "/profile/:id",
   validateObjectId,

@@ -20,8 +20,11 @@ module.exports.registerModuleCntr = asyncHandler(async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
   // is user exist
   let user = await User.findOne({ email: req.body.email });
-  if (user) return res.status(400).send("User already registered.");
+  if (user) return res.status(400).json({ message: "email  already exist" });
 
+  let username = await User.findOne({ username: req.body.username });
+  if (username)
+    return res.status(400).json({ message: "username already exist" });
   // hash password
   const salt = await bcrybt.genSalt(10);
   const hashedPassword = await bcrybt.hash(req.body.password, salt);
@@ -65,12 +68,13 @@ module.exports.loginModuleCntr = asyncHandler(async (req, res) => {
   // @TODO: verify user account
 
   // generate token jwt
-    const token = user.genrateToken();
+  const token = user.genrateToken();
   // send response to the client
   res.status(200).json({
     _id: user._id,
     isAdmin: user.isAdmin,
     profilePhoto: user.profilePhoto,
     token: token,
+    username: user.username,
   });
 });

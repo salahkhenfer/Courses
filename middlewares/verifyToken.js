@@ -3,10 +3,10 @@ const asyncHandler = require("express-async-handler");
 const { User } = require("../models/User");
 
 const verifyToken = asyncHandler(async (req, res, next) => {
-  const token = req.headers.authorization.split(" ")[1];
-  if (!token) return res.status(401).json({ message: "Access Denied" });
-
   try {
+    const token = req.headers.authorization.split(" ")[1];
+    if (!token) return res.status(401).json({ message: "Access Denied" });
+
     const verifyPyload = jwt.verify(token, process.env.JWT_SECRET);
     req.user = verifyPyload;
     next();
